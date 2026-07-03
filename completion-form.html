@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Service Completion Form</title>
+<style>
+  :root{
+    --bark:#3E2C23;
+    --cedar:#7A5233;
+    --sand:#F3EDE2;
+    --canvas:#FFFFFF;
+    --safety:#D9622B;
+    --ok:#3E6B4F;
+    --line:#DCD2C0;
+    --ink:#2B221B;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--sand);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding-bottom:60px;
+  }
+  header{
+    background:var(--bark);
+    color:var(--sand);
+    padding:20px 20px 18px;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-30px; top:-30px;
+    width:140px; height:140px;
+    border:10px solid rgba(243,237,226,0.08);
+    border-radius:6px;
+    transform:rotate(18deg);
+  }
+  header .htext{position:relative;z-index:1;}
+  header h1{
+    margin:0;
+    font-size:19px;
+    letter-spacing:0.02em;
+    font-weight:700;
+  }
+  header p.eyebrow{
+    margin:0 0 4px;
+    text-transform:uppercase;
+    font-size:11px;
+    letter-spacing:0.14em;
+    color:var(--safety);
+    font-weight:700;
+  }
+  header p.sub{
+    margin:6px 0 0;
+    font-size:13px;
+    color:rgba(243,237,226,0.75);
+  }
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:18px 16px 0;
+  }
+  .card{
+    background:var(--canvas);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px 16px;
+    margin-bottom:16px;
+  }
+  .card h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--cedar);
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2 .num{
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--cedar);
+    color:var(--sand);
+    font-size:11px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin:0 0 6px;
+    color:var(--ink);
+  }
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  input[type=text], input[type=date], textarea{
+    width:100%;
+    font-size:16px;
+    padding:11px 12px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    font-family:inherit;
+    color:var(--ink);
+  }
+  input:focus, textarea:focus{
+    outline:none;
+    border-color:var(--cedar);
+  }
+  textarea{resize:vertical;min-height:90px;line-height:1.4;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:420px){.grid2{grid-template-columns:1fr;}}
+
+  .equip-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .equip-opt{
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:12px 10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    transition:border-color .15s, background .15s;
+    user-select:none;
+  }
+  .equip-opt input{display:none;}
+  .equip-opt .box{
+    width:20px;height:20px;
+    border:2px solid var(--cedar);
+    border-radius:5px;
+    flex-shrink:0;
+    position:relative;
+  }
+  .equip-opt input:checked + .box{
+    background:var(--cedar);
+  }
+  .equip-opt input:checked + .box::after{
+    content:"";
+    position:absolute;
+    left:5px; top:1px;
+    width:6px; height:11px;
+    border:solid var(--sand);
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .equip-opt.checked{
+    border-color:var(--cedar);
+    background:#F8F3EA;
+  }
+  .equip-opt input[type=radio] + .box{
+    border-radius:50%;
+  }
+  .equip-opt input[type=radio]:checked + .box::after{
+    content:"";
+    position:absolute;
+    left:4px; top:4px;
+    width:8px; height:8px;
+    border:none;
+    background:var(--cedar);
+    border-radius:50%;
+    transform:none;
+  }
+  .other-row{
+    margin-top:10px;
+    display:none;
+  }
+  .other-row.show{display:block;}
+
+  .sig-wrap{
+    border:1.5px dashed var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    background:#fcfaf6;
+    touch-action:none;
+    overscroll-behavior:contain;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+  canvas#sig{
+    width:100%;
+    height:170px;
+    display:block;
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+  }
+  .sig-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:8px;
+  }
+  .sig-status{
+    font-size:12px;
+    color:#8A7F6E;
+  }
+  .sig-status.done{color:var(--ok);font-weight:600;}
+  .btn-clear{
+    background:none;
+    border:none;
+    color:var(--safety);
+    font-size:13px;
+    font-weight:700;
+    padding:6px 4px;
+  }
+  .confirm-row{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:#F8F3EA;
+    border-radius:8px;
+    padding:12px;
+    margin-top:14px;
+    font-size:12.5px;
+    line-height:1.4;
+    color:#5A4A3A;
+  }
+  .confirm-row input{margin-top:2px;flex-shrink:0;}
+
+  .submit-bar{
+    max-width:640px;
+    margin:0 auto;
+    padding:4px 16px 24px;
+  }
+  button#submitBtn{
+    width:100%;
+    background:var(--safety);
+    color:#fff;
+    border:none;
+    padding:16px;
+    border-radius:9px;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:0.01em;
+  }
+  button#submitBtn:disabled{
+    background:#C9BBA8;
+  }
+  .errmsg{
+    color:#B23A2E;
+    font-size:12.5px;
+    margin-top:6px;
+    display:none;
+  }
+  .field.err input, .field.err textarea{border-color:#B23A2E;}
+  .field.err .errmsg{display:block;}
+
+  /* Success screen */
+  #successView{
+    display:none;
+    max-width:640px;
+    margin:0 auto;
+    padding:30px 16px 40px;
+    text-align:center;
+  }
+  #successView .check{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:var(--ok);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 16px;
+    font-size:28px;
+  }
+  #successView h2{margin:0 0 6px;font-size:19px;color:var(--bark);}
+  #successView p{color:#6B5D4C;font-size:14px;margin:0 0 20px;}
+  .summary{
+    text-align:left;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+    font-size:13.5px;
+    line-height:1.7;
+  }
+  .summary b{color:var(--cedar);}
+  .summary hr{border:none;border-top:1px solid var(--line);margin:10px 0;}
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+  .actions button{
+    flex:1;
+    padding:13px;
+    border-radius:8px;
+    font-weight:700;
+    font-size:14px;
+    border:1.5px solid var(--cedar);
+    background:#fff;
+    color:var(--cedar);
+  }
+  .actions button.primary{
+    background:var(--bark);
+    color:#fff;
+    border-color:var(--bark);
+  }
+  @media print{
+    header::after{display:none;}
+    button, .submit-bar{display:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="htext">
+    <p class="eyebrow">Service order &middot; job completion</p>
+    <h1>Service Completion Form</h1>
+    <p class="sub">Fill out on site. Get the customer's signature at the end.</p>
+  </div>
+</header>
+
+<main id="formView">
+
+  <div class="card">
+    <h2><span class="num">1</span>Customer &amp; Order Info</h2>
+    <div class="field">
+      <label for="clientName">Customer name</label>
+      <input type="text" id="clientName" placeholder="Full name">
+      <div class="errmsg">Please enter the customer's name.</div>
+    </div>
+    <div class="field">
+      <label for="address">Address</label>
+      <input type="text" id="address" placeholder="Street, number, city">
+      <div class="errmsg">Please enter the address.</div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="orderNum">Order number</label>
+        <input type="text" id="orderNum" placeholder="e.g. 10234">
+        <div class="errmsg">Please enter the order number.</div>
+      </div>
+      <div class="field">
+        <label for="visitDate">Visit date</label>
+        <input type="date" id="visitDate">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span>Equipment Type</h2>
+    <div class="equip-grid" id="equipGrid">
+      <label class="equip-opt"><input type="checkbox" value="Gazebo"><span class="box"></span>Gazebo</label>
+      <label class="equip-opt"><input type="checkbox" value="Pergola"><span class="box"></span>Pergola</label>
+      <label class="equip-opt"><input type="checkbox" value="Playset"><span class="box"></span>Playset</label>
+      <label class="equip-opt"><input type="checkbox" value="Gym Equipment"><span class="box"></span>Gym Equipment</label>
+      <label class="equip-opt"><input type="checkbox" value="Sauna"><span class="box"></span>Sauna</label>
+      <label class="equip-opt"><input type="checkbox" value="Other" id="otherCheck"><span class="box"></span>Other</label>
+    </div>
+    <div class="other-row" id="otherRow">
+      <input type="text" id="otherText" placeholder="Specify equipment">
+    </div>
+    <div class="errmsg" id="equipErr" style="display:none;margin-top:10px;">Please select at least one equipment type.</div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">3</span>Order Completion</h2>
+    <label>Was the service order 100% completed?</label>
+    <div class="equip-grid" id="completeGrid" style="margin-bottom:14px;">
+      <label class="equip-opt" data-group="complete"><input type="radio" name="complete" value="Yes"><span class="box"></span>Yes</label>
+      <label class="equip-opt" data-group="complete"><input type="radio" name="complete" value="No"><span class="box"></span>No</label>
+    </div>
+    <div class="errmsg" id="completeErr" style="display:none;margin-bottom:14px;">Please select Yes or No.</div>
+
+    <div class="field">
+      <label for="techName">Technician</label>
+      <input type="text" id="techName" placeholder="Technician name">
+      <div class="errmsg">Please enter the technician's name.</div>
+    </div>
+    <div class="field">
+      <label for="notes">Notes (optional)</label>
+      <textarea id="notes" placeholder="Any additional observations..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">4</span>Customer Signature</h2>
+    <label>The customer confirms the service order described above</label>
+    <div class="sig-wrap">
+      <canvas id="sig"></canvas>
+    </div>
+    <div class="sig-row">
+      <span class="sig-status" id="sigStatus">Sign below with your finger</span>
+      <button class="btn-clear" id="clearSig" type="button">Clear</button>
+    </div>
+    <div class="errmsg" id="sigErr" style="display:none;">Customer signature is required.</div>
+
+    <div class="confirm-row">
+      <input type="checkbox" id="confirmBox">
+      <label for="confirmBox" style="margin:0;font-weight:500;">I confirm the information above is accurate and the customer witnessed and approved the work.</label>
+    </div>
+  </div>
+
+</main>
+
+<div class="submit-bar">
+  <button id="submitBtn">Complete &amp; Generate Record</button>
+</div>
+
+<div id="successView">
+  <div class="check">✓</div>
+  <h2>Record completed</h2>
+  <p>Save or send this summary to the office.</p>
+  <div class="summary" id="summaryBox"></div>
+  <div class="actions">
+    <button id="newFormBtn">New form</button>
+    <button class="primary" id="printBtn">Save / Print PDF</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---- equipment / choice option styling ----
+  const opts = document.querySelectorAll('.equip-opt');
+  opts.forEach(function(opt){
+    const input = opt.querySelector('input');
+    opt.addEventListener('click', function(e){
+      setTimeout(function(){
+        if(input.type === 'radio'){
+          // sync the whole radio group's visual state
+          document.querySelectorAll('input[name="' + input.name + '"]').forEach(function(radio){
+            radio.closest('.equip-opt').classList.toggle('checked', radio.checked);
+          });
+          document.getElementById('completeErr').style.display = 'none';
+        } else {
+          opt.classList.toggle('checked', input.checked);
+        }
+        if(input.id === 'otherCheck'){
+          document.getElementById('otherRow').classList.toggle('show', input.checked);
+        }
+      },0);
+    });
+  });
+
+  // ---- signature pad ----
+  const canvas = document.getElementById('sig');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, hasSignature = false;
+  let dpr = window.devicePixelRatio || 1;
+
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    // Guard against a zero-size read (can happen if this runs before the
+    // browser has finished laying out the page, e.g. a local file preview).
+    if(rect.width < 5 || rect.height < 5){
+      requestAnimationFrame(resizeCanvas);
+      return;
+    }
+    const data = hasSignature ? canvas.toDataURL() : null;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#2B221B';
+    if(data){
+      const img = new Image();
+      img.onload = function(){ ctx.drawImage(img, 0, 0, rect.width, rect.height); };
+      img.src = data;
+    }
+  }
+  // Double rAF so we resize only after the browser has committed layout —
+  // important on local/offline file views where the first paint can lag.
+  requestAnimationFrame(function(){ requestAnimationFrame(resizeCanvas); });
+  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('orientationchange', function(){ setTimeout(resizeCanvas, 200); });
+
+  function pos(e){
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+  function start(e){
+    if(e.cancelable) e.preventDefault();
+    drawing = true;
+    if(canvas.setPointerCapture && e.pointerId !== undefined){
+      try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
+    }
+    const p = pos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    // draw a dot for a simple tap, in case no move follows
+    ctx.lineTo(p.x + 0.1, p.y + 0.1);
+    ctx.stroke();
+  }
+  function move(e){
+    if(!drawing) return;
+    if(e.cancelable) e.preventDefault();
+    const p = pos(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    if(!hasSignature){
+      hasSignature = true;
+      document.getElementById('sigStatus').textContent = 'Signature captured';
+      document.getElementById('sigStatus').classList.add('done');
+    }
+  }
+  function end(e){
+    if(!drawing) return;
+    drawing = false;
+    if(canvas.releasePointerCapture && e && e.pointerId !== undefined){
+      try{ canvas.releasePointerCapture(e.pointerId); }catch(err){}
+    }
+  }
+
+  if(window.PointerEvent){
+    canvas.addEventListener('pointerdown', start, {passive:false});
+    canvas.addEventListener('pointermove', move, {passive:false});
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointercancel', end);
+    canvas.addEventListener('pointerleave', end);
+  } else {
+    // Fallback for older browsers without Pointer Events support
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+    canvas.addEventListener('touchstart', function(e){ start(e.touches[0]); }, {passive:false});
+    canvas.addEventListener('touchmove', function(e){ e.preventDefault(); move(e.touches[0]); }, {passive:false});
+    canvas.addEventListener('touchend', end);
+    canvas.addEventListener('touchcancel', end);
+  }
+
+  document.getElementById('clearSig').addEventListener('click', function(){
+    ctx.save();
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.restore();
+    hasSignature = false;
+    ctx.beginPath();
+    const s = document.getElementById('sigStatus');
+    s.textContent = 'Sign below with your finger';
+    s.classList.remove('done');
+    document.getElementById('sigErr').style.display = 'none';
+  });
+
+  // ---- validation & submit ----
+  function setErr(fieldEl, on){
+    fieldEl.classList.toggle('err', on);
+  }
+
+  document.getElementById('submitBtn').addEventListener('click', function(){
+    let ok = true;
+
+    const req = ['clientName','address','orderNum','techName'];
+    req.forEach(function(id){
+      const el = document.getElementById(id);
+      const fieldEl = el.closest('.field');
+      const empty = !el.value.trim();
+      setErr(fieldEl, empty);
+      if(empty) ok = false;
+    });
+
+    const checkedEquip = Array.from(document.querySelectorAll('#equipGrid .equip-opt input:checked'));
+    const equipErr = document.getElementById('equipErr');
+    if(checkedEquip.length === 0){
+      equipErr.style.display = 'block';
+      ok = false;
+    } else {
+      equipErr.style.display = 'none';
+    }
+
+    const completeChoice = document.querySelector('input[name="complete"]:checked');
+    const completeErr = document.getElementById('completeErr');
+    if(!completeChoice){
+      completeErr.style.display = 'block';
+      ok = false;
+    } else {
+      completeErr.style.display = 'none';
+    }
+
+    const sigErr = document.getElementById('sigErr');
+    if(!hasSignature){
+      sigErr.style.display = 'block';
+      ok = false;
+    } else {
+      sigErr.style.display = 'none';
+    }
+
+    if(!document.getElementById('confirmBox').checked){
+      ok = false;
+      document.getElementById('confirmBox').parentElement.style.outline = '2px solid #B23A2E';
+      document.getElementById('confirmBox').parentElement.style.borderRadius = '8px';
+    } else {
+      document.getElementById('confirmBox').parentElement.style.outline = 'none';
+    }
+
+    if(!ok){
+      const firstErr = document.querySelector('.field.err, #equipErr[style*="block"], #completeErr[style*="block"], #sigErr[style*="block"]');
+      if(firstErr) firstErr.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+
+    // build summary
+    const equipList = checkedEquip.map(function(c){
+      return c.id === 'otherCheck' ? (document.getElementById('otherText').value.trim() || 'Other') : c.value;
+    }).join(', ');
+
+    const dateVal = document.getElementById('visitDate').value;
+    const dateFmt = dateVal ? new Date(dateVal + 'T00:00:00').toLocaleDateString('en-US') : '—';
+
+    const sigDataUrl = canvas.toDataURL('image/png');
+
+    document.getElementById('summaryBox').innerHTML =
+      '<b>Customer:</b> ' + esc(document.getElementById('clientName').value) + '<br>' +
+      '<b>Address:</b> ' + esc(document.getElementById('address').value) + '<br>' +
+      '<b>Order #:</b> ' + esc(document.getElementById('orderNum').value) + ' &nbsp; <b>Date:</b> ' + dateFmt +
+      '<hr>' +
+      '<b>Equipment:</b> ' + esc(equipList) +
+      '<hr>' +
+      '<b>Order 100% completed:</b> ' + esc(completeChoice.value) +
+      (document.getElementById('notes').value.trim()
+        ? '<br><b>Notes:</b><br>' + esc(document.getElementById('notes').value).replace(/\n/g,'<br>')
+        : '') +
+      '<hr>' +
+      '<b>Technician:</b> ' + esc(document.getElementById('techName').value) +
+      '<hr>' +
+      '<b>Customer signature:</b><br><img src="' + sigDataUrl + '" style="max-width:100%;border:1px solid #DCD2C0;border-radius:6px;margin-top:6px;background:#fff;">';
+
+    document.getElementById('formView').style.display = 'none';
+    document.querySelector('.submit-bar').style.display = 'none';
+    document.getElementById('successView').style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  function esc(s){
+    return (s || '').replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  document.getElementById('printBtn').addEventListener('click', function(){
+    window.print();
+  });
+  document.getElementById('newFormBtn').addEventListener('click', function(){
+    window.location.reload();
+  });
+
+  // default date = today
+  document.getElementById('visitDate').valueAsDate = new Date();
+})();
+</script>
+
+</body>
+</html>
